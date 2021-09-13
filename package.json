@@ -1,0 +1,31 @@
+{
+  "name": "js-cord",
+  "version": "1.0.0",
+  "description": "Discord api wrapper written for javascript.",
+  "main": "./export.js",
+  "types": "./index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WayvshockGD/JS-Cord.git"
+  },
+  "author": "Wayvshock",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/WayvshockGD/JS-Cord/issues"
+  },
+  "homepage": "https://github.com/WayvshockGD/JS-Cord#readme",
+  "dependencies": {
+    "discord-api-types": "^0.23.1",
+    "eventemitter3": "^4.0.7",
+    "got": "^11.8.2",
+    "typescript": "^4.4.3",
+    "ws": "^8.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^16.9.1",
+    "@types/ws": "^7.4.7"
+  }
+}
