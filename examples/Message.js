@@ -1,16 +1,8 @@
 let { Client } = require("../export");
+let { token } = require("./config.json");
 
-let client = new Client("");
-
-client.setOptions({
-    gateway: {
-        intents: [
-            "guilds",
-            "guildMessages"
-        ]
-    }
+let client = new Client(token, {
+    debug: true
 });
 
-client.sendMessage("", "test");
-
-client.getBotGateway();
+client.gateway.startConnection();

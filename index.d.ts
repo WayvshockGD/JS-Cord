@@ -1,11 +1,15 @@
 declare module "js-cord" {
 
     import {} from "discord-api-types";
+    import { ClientOptions as WebSocketOptions } from "ws";
+    
     interface ClientOptions {
         gateway?: {
             shards?: number;
-            intents?: intentStrings[] | number; 
+            intents?: intentStrings[] | number;
         };
+        debug?: boolean;
+        websocketOptions?: WebSocketOptions;
         presence?: {
             mobile?: boolean;
         };
