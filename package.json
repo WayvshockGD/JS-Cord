@@ -19,14 +19,16 @@
   "homepage": "https://github.com/WayvshockGD/JS-Cord#readme",
   "dependencies": {
     "discord-api-types": "^0.23.1",
+    "erlpack": "^0.1.3",
     "eventemitter3": "^4.0.7",
     "got": "^11.8.2",
+    "node-gyp": "^8.2.0",
     "typescript": "^4.4.3",
-    "ws": "^8.2.2"
+    "ws": "^8.2.2",
+    "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
     "@types/node": "^16.9.1",
-    "@types/pako": "^1.0.2",
     "@types/ws": "^7.4.7"
   }
 }

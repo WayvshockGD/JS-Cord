@@ -6,7 +6,7 @@ declare module "js-cord" {
     interface ClientOptions {
         gateway?: {
             shards?: number;
-            intents?: intentStrings[] | number;
+            intents?: number;
         };
         debug?: boolean;
         websocketOptions?: WebSocketOptions;
@@ -71,11 +71,14 @@ declare module "js-cord" {
         }
     }
 
+    interface ClientEvents<T> {
+        (event: "ready", listener: () => void): T;
+        (event: "messageEvent", listener: (message: Message) => void): T;
+    }
+
     type shard = Map<number, Shard>;
 
     type errors = "EMPTY_OPTIONS" | "EMPTY_TOKEN";
-
-    type intentStrings = (keyof Constants["intents"]);
 
     type colors = "RED" | "ORANGE" | "YELLOW" | "GREEN" | "BLUE" | "PURPLE" | "GREY";
 
@@ -85,9 +88,26 @@ declare module "js-cord" {
         initShard();
     }
 
+    export class Base {
+        id: string;
+    }
+
     export class ShardManager {
         initShard(id: number);
     }
 
-    export class Client {}
+    export class Client {
+        sendMessage(id: string, content: MessageOptions): Promise<Message>;
+    }
+
+    export class Message extends Base {
+        client: Client;
+        channel: GenericChannel;
+        content: string;
+    }
+
+    export class GenericChannel extends Base {
+        client: Client;
+        sendMessage(content: MessageOptions): Promise<Message>;
+    }
 }
