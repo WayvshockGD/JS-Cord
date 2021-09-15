@@ -1,6 +1,7 @@
 declare module "js-cord" {
 
-    import {} from "discord-api-types";
+    import { APIActionRowComponent, APIChannel, APIGuild, APIMessage } from "discord-api-types";
+    import { EventEmitter } from "eventemitter3";
     import { ClientOptions as WebSocketOptions } from "ws";
     
     interface ClientOptions {
@@ -48,6 +49,7 @@ declare module "js-cord" {
     interface MessageOptions {
         content: string;
         embeds: Embed[];
+        components: APIActionRowComponent[];
     }
 
     interface Constants {
@@ -74,13 +76,20 @@ declare module "js-cord" {
     interface ClientEvents<T> {
         (event: "ready", listener: () => void): T;
         (event: "messageEvent", listener: (message: Message) => void): T;
+        (event: "guildCreateEvent", listener: (guild: APIGuild) => void): T;
     }
 
-    type shard = Map<number, Shard>;
+    type shard = Collection<number, Shard>;
+    type guild = Collection<string, APIGuild>;
+    type channel = Collection<string, APIChannel>;
 
     type errors = "EMPTY_OPTIONS" | "EMPTY_TOKEN";
 
     type colors = "RED" | "ORANGE" | "YELLOW" | "GREEN" | "BLUE" | "PURPLE" | "GREY";
+
+    type presences = "ONLINE" | "IDLE" | "DND";
+
+    type channels = GuildChannel;
 
     export class Shard {
         client: Client;
@@ -90,24 +99,54 @@ declare module "js-cord" {
 
     export class Base {
         id: string;
+        client: Client;
+        json(props: string[]): {};
     }
 
     export class ShardManager {
-        initShard(id: number);
+        constructor(client: Client);
+        initShard(id: number, url: string);
     }
 
-    export class Client {
+    export class ChannelManager {
+        static init(data: APIChannel, client: Client): channels;
+    }
+
+    export class Client extends EventEmitter {
+        on: ClientEvents<this>;
+
+        getGuild(id: string): APIGuild;
+        deleteMessage(channelID: string, messageID: string);
         sendMessage(id: string, content: MessageOptions): Promise<Message>;
     }
 
+    export class Member extends Base {}
+
     export class Message extends Base {
-        client: Client;
-        channel: GenericChannel;
+        constructor(data: APIMessage, client: Client);
+        channel: channels;
         content: string;
+
+        deleteContent(time?: number);
     }
 
-    export class GenericChannel extends Base {
-        client: Client;
+    export class Guild {
+        id: string;
+        constructor(id: string, client: Client);
+        json(): {};
+    }
+
+    export class GuildChannel extends Base {
+        nsfw: boolean;
+        name: string;
+        constructor(data: APIChannel, client: Client);
+        
         sendMessage(content: MessageOptions): Promise<Message>;
+        toString(): string;
+    }
+
+    export class Collection<K, V> extends Map<K, V> {
+        public getFirst(): V | false;
+        public toJSON(): { [key: string]: V };
     }
 }

@@ -1,7 +1,7 @@
 let { Client } = require("../export");
 let { token } = require("./config.json");
 
-let client = new Client(token, { debug: true });
+let client = new Client(token);
 
 client.on("ready", () => {
     console.log("Ready!");
@@ -9,7 +9,7 @@ client.on("ready", () => {
 
 client.on("messageEvent", (message) => {
     if (message.content.startsWith("?test")) {
-        message.channel.sendMessage();
+        console.log(client.guilds.toJSON());
     }
 })
 
