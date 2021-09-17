@@ -1,16 +1,21 @@
 declare module "js-cord" {
 
-    import { APIActionRowComponent, APIChannel, APIGuild, APIMessage } from "discord-api-types";
+    import { APIActionRowComponent, APIChannel, APIChannelMention, APIGuild, APIGuildMember, APIMessage } from "discord-api-types";
     import { EventEmitter } from "eventemitter3";
     import { ClientOptions as WebSocketOptions } from "ws";
+    import BaseCollection from "@jscord/collection";
     
     interface ClientOptions {
         gateway?: {
             shards?: number;
-            intents?: number;
+            intents?: number | intentStrings;
         };
         debug?: boolean;
         websocketOptions?: WebSocketOptions;
+        image?: {
+            size?: number;
+            format?: formats;
+        }
         presence?: {
             mobile?: boolean;
         };
@@ -25,6 +30,12 @@ declare module "js-cord" {
             reset_after: number;
             max_concurrency: number;
         };
+    }
+
+    interface MentionManagerParams {
+        roles: APIMessage["mention_roles"];
+        channels: APIMessage["mention_channels"];
+        members: APIMessage["mentions"];
     }
 
     interface EmbedField {
@@ -79,15 +90,27 @@ declare module "js-cord" {
         (event: "guildCreateEvent", listener: (guild: APIGuild) => void): T;
     }
 
-    type shard = Collection<number, Shard>;
+    type memberMentions = Collection<string, APIGuildMember>;
+    
+    type channelMentions = Collection<string, APIChannelMention>;
+
+    type roleMentions = Collection<string, string[]>;
+
+    type shard = Collection<string, Shard>;
+
     type guild = Collection<string, APIGuild>;
+
     type channel = Collection<string, APIChannel>;
 
-    type errors = "EMPTY_OPTIONS" | "EMPTY_TOKEN";
+    type intentStrings = Array<keyof Constants["intents"]>;
+
+    type errors = "EMPTY_OPTIONS" | "EMPTY_TOKEN" | "INVALID_FORMAT" | "INVALID_SIZE" | "INVALID_COLOR";
 
     type colors = "RED" | "ORANGE" | "YELLOW" | "GREEN" | "BLUE" | "PURPLE" | "GREY";
 
     type presences = "ONLINE" | "IDLE" | "DND";
+
+    type formats = "PNG" | "JPEG" | "GIF";
 
     type channels = GuildChannel;
 
@@ -108,6 +131,13 @@ declare module "js-cord" {
         initShard(id: number, url: string);
     }
 
+    export class MentionManager {
+        constructor(data: MentionManagerParams);
+        get role(): roleMentions;
+        get channel(): channelMentions;
+        get member(): memberMentions;
+    }
+
     export class ChannelManager {
         static init(data: APIChannel, client: Client): channels;
     }
@@ -118,6 +148,7 @@ declare module "js-cord" {
         getGuild(id: string): APIGuild;
         deleteMessage(channelID: string, messageID: string);
         sendMessage(id: string, content: MessageOptions): Promise<Message>;
+        format(url: string): string;
     }
 
     export class Member extends Base {}
@@ -125,13 +156,17 @@ declare module "js-cord" {
     export class Message extends Base {
         constructor(data: APIMessage, client: Client);
         channel: channels;
+        guild: Guild;
         content: string;
+        mentions: MentionManager;
 
         deleteContent(time?: number);
     }
 
     export class Guild {
         id: string;
+        icon: string;
+        memberCount: number;
         constructor(id: string, client: Client);
         json(): {};
     }
@@ -145,8 +180,5 @@ declare module "js-cord" {
         toString(): string;
     }
 
-    export class Collection<K, V> extends Map<K, V> {
-        public getFirst(): V | false;
-        public toJSON(): { [key: string]: V };
-    }
+    export class Collection<K extends string, V> extends BaseCollection<K, V> {}
 }
